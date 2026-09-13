@@ -80,6 +80,12 @@ const Music = (()=>{
     };
     document.addEventListener('pointerdown', once);
   }
+  // stop music when the app is backgrounded, locked, or loses focus
+  function resume(){ if(started && cur && els[cur].paused) els[cur].play().catch(()=>{}); }
+  function pauseNow(){ if(cur && !els[cur].paused) els[cur].pause(); }
+  document.addEventListener('visibilitychange', ()=>{ document.hidden ? pauseNow() : resume(); });
+  window.addEventListener('blur', pauseNow);
+  window.addEventListener('focus', ()=>{ setTimeout(resume, 120); });
   return { play, screen, arm };
 })();
 Music.arm();

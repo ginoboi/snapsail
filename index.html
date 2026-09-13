@@ -167,6 +167,83 @@ body{background:#bae6fd;color:#0c4a6e}
 .errmsg{text-align:center;font-size:13.5px;font-weight:700;color:#e11d48;margin-top:10px;min-height:18px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0c4a6e;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;font-size:14px;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
+
+/* ---------- responsive: dynamic viewport ---------- */
+@supports (height:100dvh){ html,body{height:100dvh} }
+
+/* ---------- responsive: tablet & big screens ---------- */
+@media (min-width:700px){
+  #app{max-width:860px}
+  .topbar .title{font-size:24px}
+  .topbar .back{width:60px;height:60px;font-size:30px}
+  .crewpill{font-size:17px;padding:8px 16px 8px 8px}
+  .crewpill img{width:34px;height:34px}
+  .scroll{padding:16px 22px 120px}
+  .bigbtn{font-size:24px;padding:20px}
+  .deckgrid{grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .deckcard .nm{font-size:17px}
+  .deckcard .sb{font-size:13px}
+  .deckcard .ic{width:92px;height:92px}
+  .quizcard{padding:28px 26px;margin-top:18px}
+  .qprompt{font-size:28px;min-height:76px}
+  .qchoice{font-size:23px;padding:18px 10px}
+  .qart img{width:64px;height:64px}
+  #screen-title h1{font-size:60px}
+  #screen-title .sub{font-size:22px}
+  #title-boat{width:250px}
+  .namebox{font-size:30px}
+  .let{width:48px;height:52px;font-size:20px}
+  .num{width:60px;height:60px;font-size:26px}
+  .key{font-size:30px;padding:20px}
+  #result-msg{font-size:31px}
+  #result-star{width:160px;height:160px}
+  .parentcard h3{font-size:19px}
+}
+
+/* ---------- responsive: landscape phones ---------- */
+@media (orientation:landscape) and (max-height:520px){
+  #app{max-width:100%}
+  .topbar{padding:6px 12px 0}
+  .topbar .back{width:42px;height:42px;font-size:22px;border-radius:14px}
+  .topbar .title{font-size:17px}
+  .crewpill{font-size:13px;padding:4px 12px 4px 4px}
+  .crewpill img{width:24px;height:24px}
+  #quiz-progress{margin:4px 12px 0;height:10px}
+  #quiz-count{font-size:12px;margin-top:4px}
+  .scroll{padding:6px 12px 84px}
+  .quizcard{padding:12px 14px;margin-top:8px;border-radius:20px}
+  .qprompt{font-size:19px;min-height:44px}
+  .qart{margin:8px 0 0}
+  .qart img{width:40px;height:40px}
+  .qaudio{font-size:13px;padding:6px 14px;margin-top:4px}
+  .qchoices{gap:8px;margin-top:12px}
+  .qchoice{font-size:16px;padding:10px 6px;border-radius:14px;border-width:2px}
+  #screen-title{padding:16px}
+  #screen-title h1{font-size:32px}
+  #screen-title .sub{font-size:14px}
+  #title-boat{width:110px;border-radius:20px;margin-bottom:4px}
+  #screen-title .bigbtn{max-width:280px;margin:12px auto 0;font-size:17px;padding:12px}
+  #result-star{width:90px;height:90px}
+  #result-msg{font-size:20px;margin-top:8px}
+  #result-sub{font-size:13px}
+  #screen-result{padding:16px}
+  #screen-result .bigbtn{font-size:17px;padding:12px;margin-top:8px}
+  .namebox{min-height:44px;font-size:20px;padding:8px 14px}
+  .let{width:34px;height:38px;font-size:14px;border-radius:10px}
+  .letrow{gap:5px;margin-bottom:6px}
+  .wordgrid{grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0}
+  .codedigit{width:38px;height:46px;font-size:21px}
+  .num{width:42px;height:42px;font-size:18px;border-radius:12px}
+  .numrow{gap:8px}
+  .cornerbtn{bottom:10px;width:42px;height:42px;border-radius:12px}
+  .cornerbtn img{width:24px;height:24px}
+  .deckgrid{grid-template-columns:repeat(4,1fr);gap:10px}
+  #home-hello{font-size:16px;padding:10px 16px 0}
+  #home-hello img{width:28px;height:28px}
+  .keypad{gap:8px;margin:10px auto;max-width:240px}
+  .key{font-size:20px;padding:10px;border-radius:14px}
+  #pin-dots{margin-top:10px}
+}
 </style>
 </head>
 <body>
