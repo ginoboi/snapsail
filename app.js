@@ -531,8 +531,8 @@ function renderReview(){
   const slot = document.getElementById('review-demo-slot');
   slot.innerHTML = reviewDeck.demo ? '<div class="demobadge">DEMO QUESTIONS — AI vision unavailable right now</div>' : '';
   const img = document.getElementById('review-img');
-  img.src = reviewDeck.image || '';
-  img.style.display = reviewDeck.image ? 'block' : 'none';
+  if(reviewDeck.image){ img.src = reviewDeck.image; img.style.display = 'block'; }
+  else { img.removeAttribute('src'); img.style.display = 'none'; }
   const list = document.getElementById('review-list');
   list.innerHTML = '';
   reviewDeck.questions.forEach((q,i)=>{
