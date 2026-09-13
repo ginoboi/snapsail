@@ -39,8 +39,8 @@ function crewImg(word){ return A+'crew/'+word+'.jpg'; }
 function crewBadgeHTML(){
   const h = store.get('household','');
   if(!h) return '';
-  const [animal, num] = h.split('-');
-  return '<img src="'+crewImg(animal)+'">'+num;
+  const [animal] = h.split('-');
+  return '<img src="'+crewImg(animal)+'">'+(store.get('name','')||'');
 }
 function renderCrewPills(){
   const badge = crewBadgeHTML();
@@ -163,10 +163,36 @@ const STARTER = [
   ]}
 ];
 
-/* ---------- setup (animal + 4-digit code) ---------- */
-let setupPick = {animal:null, digits:''};
-function startApp(){ go('screen-setup'); renderSetup(); }
+/* ---------- setup (name + secret badge + number) ---------- */
+let setupPick = {name:'', animal:null, digits:''};
+function startApp(){
+  const h = store.get('household','');
+  if(h){ const [a,n] = h.split('-'); setupPick.animal = a; setupPick.digits = n; }
+  go('screen-setup'); renderSetup();
+}
 function renderSetup(){
+  document.getElementById('name-box').textContent = setupPick.name || '';
+  const pad = document.getElementById('letter-pad');
+  pad.innerHTML = '';
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.match(/.{1,7}/g).forEach(row=>{
+    const r = document.createElement('div'); r.className='letrow';
+    [...row].forEach(L=>{
+      const b = document.createElement('button');
+      b.className='let'; b.textContent=L;
+      b.onclick=()=>{ if(setupPick.name.length<12){ setupPick.name+=L; renderSetup(); SFX.blip(); } };
+      r.appendChild(b);
+    });
+    pad.appendChild(r);
+  });
+  const fn = document.createElement('div'); fn.className='letrow';
+  const del = document.createElement('button'); del.className='let fn'; del.textContent='Del';
+  del.onclick=()=>{ setupPick.name = setupPick.name.slice(0,-1); renderSetup(); };
+  const spc = document.createElement('button'); spc.className='let fn'; spc.textContent='Space';
+  spc.onclick=()=>{ if(setupPick.name.length<11){ setupPick.name+=' '; renderSetup(); } };
+  fn.appendChild(del); fn.appendChild(spc); pad.appendChild(fn);
+  renderSetupCode();
+}
+function renderSetupCode(){
   const ag = document.getElementById('animal-grid');
   ag.innerHTML = '';
   ANIMALS.forEach(([word,label])=>{
@@ -196,10 +222,10 @@ function renderSetup(){
   del.className='num fn'; del.textContent='Del';
   del.onclick = ()=>{ setupPick.digits = setupPick.digits.slice(0,-1); renderSetup(); };
   nr.appendChild(del);
-  const ready = setupPick.animal && setupPick.digits.length===4;
+  const ready = setupPick.name.trim().length>=2 && setupPick.animal && setupPick.digits.length===4;
   const btn = document.getElementById('setup-go');
   btn.disabled = !ready;
-  btn.innerHTML = ready ? 'Sail as '+setupPick.animal+' '+setupPick.digits+' →' : 'Continue';
+  btn.innerHTML = ready ? 'Sail as '+setupPick.name.trim()+' →' : 'Continue';
 }
 function genCode(){
   setupPick.digits = String(Math.floor(1000 + Math.random()*9000));
@@ -207,6 +233,7 @@ function genCode(){
 }
 function finishSetup(){
   store.set('household', setupPick.animal + '-' + setupPick.digits);
+  store.set('name', setupPick.name.trim());
   go('screen-home'); loadKidDecks();
 }
 
@@ -215,8 +242,9 @@ let kidDecks = [];
 async function loadKidDecks(manual){
   renderCrewPills();
   const [animal, num] = (store.get('household','')||'-').split('-');
+  const nm = store.get('name','');
   document.getElementById('home-hello').innerHTML =
-    '<img src="'+crewImg(animal)+'"><div>Ahoy, crew '+num+'!<small>Tap a deck to set sail</small></div>';
+    '<img src="'+crewImg(animal)+'"><div>Ahoy, '+nm+'!<small>Tap a deck to set sail</small></div>';
   let remote = [];
   try{
     const r = await fetch(API + 'ssListDecks', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({household: store.get('household','')})});
@@ -281,6 +309,7 @@ function answer(i, btn){
     setTimeout(next, 900);
   } else {
     btn.classList.add('no'); SFX.wrong(); all[q.a].classList.add('ok');
+    logMiss(q, btn.textContent);
     setTimeout(next, 1400);
   }
 }
@@ -305,6 +334,43 @@ function readAloud(){
     const u = new SpeechSynthesisUtterance(document.getElementById('q-prompt').textContent);
     u.rate = 0.85; speechSynthesis.speak(u);
   }catch(e){}
+}
+
+function logMiss(q, wrongPick){
+  try{
+    fetch(API+'ssLogMiss', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        household: store.get('household',''),
+        player: store.get('name',''),
+        deck: Q.deck.title,
+        question: q.q,
+        wrong_pick: String(wrongPick||'').slice(0,120),
+        correct_answer: String(q.choices[q.a]||'').slice(0,120)
+      })
+    }).catch(()=>{});
+  }catch(e){}
+}
+async function loadMissLog(){
+  const box = document.getElementById('miss-items');
+  box.innerHTML = '<div class="tiny-note" style="margin-top:6px">Loading...</div>';
+  try{
+    const r = await fetch(API+'ssGetMissLog', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({household:store.get('household','')})});
+    const j = await r.json();
+    if(!j.ok || !j.items.length){ box.innerHTML = '<div class="tiny-note" style="margin-top:6px">No trouble spots yet. Smooth sailing!</div>'; return; }
+    box.innerHTML = '';
+    j.items.slice(0,10).forEach(it=>{
+      const row = document.createElement('div');
+      row.className='rowdeck'; row.style.alignItems='flex-start';
+      const when = it.last_logged ? new Date(it.last_logged).toLocaleDateString() : '';
+      row.innerHTML = '<div class="nm">'+it.question+
+        '<br><span style="color:#e11d48;font-weight:800">Missed '+it.miss_count+'x</span>'+
+        (it.wrong_picks&&it.wrong_picks.length ? ' <span style="color:#475569">picked '+it.wrong_picks.join(', ')+'</span>' : '')+
+        ' <span style="color:#166534">answer: '+it.correct_answer+'</span>'+
+        '<br><span style="color:#94a3b8;font-size:11px">'+it.deck+' · last '+when+'</span></div>';
+      box.appendChild(row);
+    });
+  }catch(e){ box.innerHTML = '<div class="tiny-note" style="margin-top:6px">No internet connection</div>'; }
 }
 
 /* ---------- parent ---------- */
@@ -358,7 +424,7 @@ function enterParent(){
   const sw = document.getElementById('merge-switch');
   if(store.get('merge', true)) sw.classList.add('on'); else sw.classList.remove('on');
   document.getElementById('code-display').textContent = store.get('household','');
-  go('screen-parent'); loadParentDecks();
+  go('screen-parent'); loadParentDecks(); loadMissLog();
 }
 function toggleMerge(){
   const sw = document.getElementById('merge-switch');
@@ -582,5 +648,6 @@ async function discardReview(){
 
 /* ---------- boot ---------- */
 (function boot(){
-  if(store.get('household','')){ go('screen-home'); loadKidDecks(); }
+  if(store.get('household','') && store.get('name','')){ go('screen-home'); loadKidDecks(); }
+  else { startApp(); }
 })();

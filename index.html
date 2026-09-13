@@ -55,6 +55,11 @@ body{background:#bae6fd;color:#0c4a6e}
 #screen-title .bigbtn{max-width:320px;margin:26px auto 0}
 
 /* setup */
+.namebox{background:#fff;border-radius:18px;padding:14px 18px;font-size:26px;font-weight:900;color:#075985;min-height:58px;letter-spacing:2px;margin:12px 0;text-align:center;box-shadow:0 3px 10px rgba(2,132,199,.18)}
+.letrow{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:8px}
+.let{width:40px;height:44px;border-radius:12px;border:none;background:#fff;font-size:17px;font-weight:900;color:#075985;box-shadow:0 3px 8px rgba(2,132,199,.16);cursor:pointer}
+.let:active{transform:scale(.93)}
+.let.fn{background:#e0f2fe;font-size:14px}
 .setupwrap{text-align:center;padding-top:6px}
 .wordgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
 .animal{background:#fff;border:3px solid rgba(255,255,255,.9);border-radius:18px;padding:6px 4px 8px;cursor:pointer;box-shadow:0 3px 10px rgba(2,132,199,.15)}
@@ -182,15 +187,18 @@ body{background:#bae6fd;color:#0c4a6e}
     <div class="veil"></div>
     <div class="topbar"><button class="back" onclick="go('screen-title')">←</button><div class="title">Your Crew</div></div>
     <div class="scroll setupwrap">
-      <div style="font-weight:800;font-size:17px">Pick your crew animal</div>
+      <div style="font-weight:800;font-size:17px">What's your name?</div>
+      <div class="namebox" id="name-box"></div>
+      <div id="letter-pad"></div>
+      <div style="font-weight:800;font-size:17px;margin-top:14px">Pick your secret badge</div>
       <div class="wordgrid" id="animal-grid"></div>
-      <div style="font-weight:800;font-size:15px;margin-top:8px">Enter your 4-digit crew number</div>
+      <div style="font-weight:800;font-size:15px;margin-top:8px">Enter your secret number</div>
       <div class="codebox" id="code-box"></div>
       <div class="numrow" id="num-row"></div>
       <div class="numrow" style="margin-top:10px">
-        <button class="num fn" onclick="genCode()">New code</button>
+        <button class="num fn" onclick="genCode()">New number</button>
       </div>
-      <div class="tiny-note">New crew? Tap "New code" and keep it secret.<br>Joining a crew? Type the number.</div>
+      <div class="tiny-note">New here? Tap "New number" and let a grown-up keep it safe.<br>Already have one? Just type it in.</div>
       <button class="bigbtn sunny" id="setup-go" onclick="finishSetup()" disabled>Continue</button>
     </div>
   </div>
@@ -257,6 +265,7 @@ body{background:#bae6fd;color:#0c4a6e}
           <div class="switch on" id="merge-switch" onclick="toggleMerge()"><div class="knob"></div></div>
         </div>
       </div>
+      <div class="parentcard"><h3>Where they need practice</h3><div id="miss-log" style="font-size:13px;color:#475569;margin-bottom:6px">Questions your player got wrong, most missed first.</div><div id="miss-items"></div></div>
       <div class="parentcard"><h3>Crew worksheets</h3><div id="parent-decks"></div></div>
       <div class="tiny-note">Family code: <b id="code-display"></b></div>
     </div>
